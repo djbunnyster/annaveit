@@ -1,0 +1,112 @@
+---
+import { getCollection } from 'astro:content';
+import Icon from './Icon.astro';
+import { u } from '../lib/url';
+
+const works = (await getCollection('works')).sort((a, b) => a.data.order - b.data.order);
+// В ленте — сильнейшие работы, остальные открываются в просмотре с последней плитки: длинная лента одинаковых плиток утомляет
+const RAIL = 14;
+const rail = works.slice(0, RAIL);
+const rest = works.slice(RAIL);
+const plural = (n: number) => (n % 10 === 1 && n % 100 !== 11 ? 'работа' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'работы' : 'работ');
+---
+<section class="works" id="works" data-works>
+  <div class="works__pin" data-works-pin>
+    <div class="wrap works__head">
+      <h2>Работы</h2>
+      <p class="lede">Косметика и техника, одежда и товары для дома, детям и питомцам. Нажмите на карточку, чтобы рассмотреть её крупно.</p>
+    </div>
+    <div class="works__rail" data-works-rail>
+      <ul class="works__track" data-works-track>
+        {rail.map((w, i) => (
+          <li class:list={['work', { 'work--big': i % 4 === 1 }]}>
+            <button class="work__btn" type="button" data-work={i} data-cursor="Смотреть" aria-label={`${w.data.title}: открыть крупно`}>
+              <span class="work__img">
+                {w.data.video
+                  ? <video src={u(w.data.video)} poster={u(w.data.image)} muted loop playsinline preload="none" data-autoplay></video>
+                  : <img src={u(w.data.image)} alt={w.data.title} width="900" height="1200" loading="lazy" decoding="async" />}
+              </span>
+              <span class="work__cap"><span class="work__niche">{w.data.niche}</span><span class="work__title">{w.data.title}</span></span>
+            </button>
+          </li>
+        ))}
+        {rest.length > 0 && (
+          <li class="work work--more">
+            <button class="work__btn" type="button" data-work={RAIL} data-cursor="Смотреть" aria-label={`Ещё ${rest.length} ${plural(rest.length)}: открыть`}>
+              <span class="work__img more">
+                {rest.slice(0, 3).map((w, k) => <img class={`more__i more__i--${k}`} src={u(w.data.image)} alt="" loading="lazy" />)}
+              </span>
+              <span class="work__cap"><span class="work__niche">Портфолио</span><span class="work__title">Ещё {rest.length} {plural(rest.length)}</span></span>
+            </button>
+          </li>
+        )}
+      </ul>
+    </div>
+    <div class="wrap works__bar" aria-hidden="true"><span data-works-progress></span></div>
+  </div>
+
+  <dialog class="lb" data-lb aria-label="Работа крупно">
+    <figure class="lb__fig"><img data-lb-img alt="" /><video data-lb-video muted loop playsinline controls hidden></video><figcaption data-lb-cap></figcaption></figure>
+    <button class="lb__x" type="button" data-lb-close aria-label="Закрыть"><Icon name="close" /></button>
+    <button class="lb__nav lb__prev" type="button" data-lb-prev aria-label="Предыдущая работа"><Icon name="prev" /></button>
+    <button class="lb__nav lb__next" type="button" data-lb-next aria-label="Следующая работа"><Icon name="next" /></button>
+  </dialog>
+  <script type="application/json" data-works-json set:html={JSON.stringify(works.map((w) => ({ img: u(w.data.image), video: w.data.video ? u(w.data.video) : '', title: w.data.title, niche: w.data.niche })))} />
+</section>
+
+<style>
+  .works { padding-top: clamp(40px, 6vw, 80px); }
+  .works__pin { min-height: 100svh; display: flex; flex-direction: column; justify-content: center; gap: clamp(32px, 4vw, 56px); padding-block: 40px; }
+  .works__head { display: flex; align-items: end; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+  .works__head .lede { max-width: 38ch; }
+  .works__rail { overflow-x: auto; scrollbar-width: thin; }
+  /* С движением на компьютере лента едет закрепом — своя прокрутка не нужна */
+  @media (min-width: 1024px) { :global(.js-motion) .works__rail { overflow: hidden; } }
+  .works__track {
+    list-style: none; margin: 0; display: flex; gap: clamp(16px, 2vw, 28px);
+    padding: 0 max(20px, calc((100vw - var(--max)) / 2 + 20px));
+    width: max-content;
+  }
+  .work__btn { display: grid; gap: 16px; text-align: left; width: clamp(240px, 23vw, 360px); }
+  .work--big .work__btn { width: clamp(280px, 28vw, 440px); }
+  .work:nth-child(even) { transform: translateY(28px); }
+  .works__track { align-items: flex-start; padding-bottom: 28px; }
+  .more { position: relative; background: var(--linen); }
+  .more__i { position: absolute; width: 62%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 10px; box-shadow: 0 20px 40px -20px rgba(35, 30, 27, .5); left: 19%; top: 13%; }
+  .more__i--0 { rotate: -9deg; translate: -16% 4%; }
+  .more__i--1 { rotate: 7deg; translate: 16% 2%; }
+  .more__i--2 { rotate: 0deg; }
+  .works__bar { height: 2px; }
+  .works__bar span { display: block; height: 100%; background: var(--mocha); transform-origin: 0 50%; transform: scaleX(0); }
+  .work__img { display: block; aspect-ratio: 3 / 4; border-radius: 12px; overflow: hidden; background: var(--linen); }
+  .work__img img, .work__img video { width: 100%; height: 100%; object-fit: cover; transition: transform 1.1s var(--ease); }
+  .work__btn:hover .work__img img { transform: scale(1.04); }
+  .work__cap { display: grid; gap: 4px; }
+  .work__niche { font: 600 12px/1.2 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--taupe); }
+  .work__title { font: 500 24px/1.1 var(--serif); }
+
+  @media (max-width: 1023px) {
+    .works__pin { min-height: 0; }
+    .works__rail { overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .works__rail::-webkit-scrollbar { display: none; }
+    .work { scroll-snap-align: center; }
+    .work__btn, .work--big .work__btn { width: min(74vw, 320px); }
+    .work:nth-child(even) { transform: none; }
+    .works__bar { display: none; }
+  }
+
+  .lb { width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: rgba(35, 30, 27, .94); color: var(--paper); }
+  .lb[open] { display: grid; place-items: center; }
+  .lb::backdrop { background: transparent; }
+  .lb__fig { margin: 0; display: grid; gap: 14px; justify-items: center; }
+  .lb__fig img, .lb__fig video { max-height: 82dvh; max-width: min(92vw, 720px); width: auto; border-radius: 10px; }
+  .lb__fig figcaption { font: 500 22px/1.2 var(--serif); }
+  .lb__x, .lb__nav { position: absolute; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: rgba(245, 241, 235, .1); transition: background .3s; }
+  .lb__x:hover, .lb__nav:hover { background: rgba(245, 241, 235, .22); }
+  .lb__x { top: calc(16px + env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); }
+  .lb__nav { top: 50%; translate: 0 -50%; }
+  .lb__prev { left: max(16px, env(safe-area-inset-left, 0px)); }
+  .lb__next { right: max(16px, env(safe-area-inset-right, 0px)); }
+  .lb :global(svg) { width: 24px; height: 24px; }
+  @media (max-width: 700px) { .lb__nav { top: auto; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); translate: none; } }
+</style>

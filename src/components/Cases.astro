@@ -1,0 +1,78 @@
+---
+import { getCollection } from 'astro:content';
+import { u } from '../lib/url';
+
+const cases = (await getCollection('cases')).sort((a, b) => a.data.order - b.data.order);
+---
+{cases.length > 0 && (
+<section class="cases" id="cases" data-cases>
+  <div class="wrap">
+    <div class="cases__head">
+      <h2 class="h-accent">До <em>и после</em></h2>
+      <div class="cases__tabs" role="tablist" aria-label="Кейсы">
+        {cases.map((c, i) => (
+          <button class="cases__tab" role="tab" type="button" aria-selected={i === 0 ? 'true' : 'false'} data-case-tab={i}>{c.data.title}</button>
+        ))}
+      </div>
+    </div>
+
+    {cases.map((c, i) => (
+      <article class="case" data-case={i} hidden={i !== 0}>
+        <div class="ba" data-ba>
+          <img class="ba__img" src={u(c.data.before)} alt={`${c.data.title}: карточка до`} width="600" height="800" loading="lazy" />
+          <div class="ba__after" data-ba-after>
+            <img class="ba__img" src={u(c.data.after)} alt={`${c.data.title}: карточка после`} width="600" height="800" loading="lazy" />
+          </div>
+          <span class="ba__tag ba__tag--b">До</span>
+          <span class="ba__tag ba__tag--a">После</span>
+          <span class="ba__line" data-ba-line><span class="ba__knob"></span></span>
+          <input class="ba__range" type="range" min="0" max="100" value="50" step="0.1" aria-label={`${c.data.title}: сравнить до и после`} data-ba-range />
+        </div>
+        <div class="case__text">
+          <div>
+            <p class="label">Что мешало продажам</p>
+            <p class="case__p">{c.data.problem}</p>
+          </div>
+          <div>
+            <p class="label">Что я сделала</p>
+            <p class="case__p">{c.data.solution}</p>
+          </div>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
+)}
+
+<style>
+  .cases { padding-block: clamp(96px, 12vw, 180px); background: var(--linen); }
+  .cases__head { display: flex; justify-content: space-between; align-items: end; gap: 28px 48px; flex-wrap: wrap; margin-bottom: clamp(40px, 5vw, 72px); }
+  .cases__tabs { display: flex; gap: 28px; flex-wrap: wrap; }
+  .cases__tab { font: 500 17px/1 var(--sans); color: var(--ink-2); padding-bottom: 8px; background: linear-gradient(var(--ink), var(--ink)) 0 100% / 0 1px no-repeat; transition: background-size .45s var(--ease), color .3s; }
+  .cases__tab[aria-selected='true'] { color: var(--ink); background-size: 100% 1px; }
+  .cases__tab:hover { color: var(--ink); }
+
+  .case { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: clamp(32px, 6vw, 110px); align-items: center; }
+  .case[hidden] { display: none; }
+  .case__text { display: grid; gap: 40px; max-width: 46ch; }
+  .case__p { margin-top: 14px; font: 500 clamp(22px, 1.9vw, 28px)/1.3 var(--serif); }
+
+  .ba { position: relative; aspect-ratio: 3 / 4; border-radius: 14px; overflow: hidden; background: var(--sand); user-select: none; touch-action: pan-y; box-shadow: 0 40px 80px -40px rgba(35, 30, 27, .5); max-width: 620px; width: 100%; }
+  .ba__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .ba__after { position: absolute; inset: 0; clip-path: inset(0 50% 0 0); }
+  .ba__tag { position: absolute; bottom: 16px; z-index: 2; font: 600 12px/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; padding: 9px 12px; border-radius: 999px; background: rgba(245, 241, 235, .9); color: var(--ink); }
+  .ba__tag--b { right: 16px; }
+  .ba__tag--a { left: 16px; background: var(--ink); color: var(--paper); }
+  .ba__line { position: absolute; z-index: 3; top: 0; bottom: 0; left: 50%; width: 2px; margin-left: -1px; background: var(--paper); pointer-events: none; }
+  .ba__knob { position: absolute; top: 50%; left: 50%; width: 52px; height: 52px; translate: -50% -50%; border-radius: 50%; background: var(--paper); box-shadow: 0 10px 24px rgba(0, 0, 0, .25); }
+  .ba__knob::before, .ba__knob::after { content: ''; position: absolute; top: 50%; width: 8px; height: 8px; border: solid var(--mocha); border-width: 0 0 1.6px 1.6px; }
+  .ba__knob::before { left: 14px; translate: 0 -50%; rotate: 45deg; }
+  .ba__knob::after { right: 14px; translate: 0 -50%; rotate: -135deg; }
+  .ba__range { position: absolute; inset: 0; z-index: 4; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; }
+  .ba:has(.ba__range:focus-visible) { outline: 2px solid var(--mocha); outline-offset: 4px; }
+
+  @media (max-width: 900px) {
+    .case { grid-template-columns: 1fr; }
+    .ba { margin-inline: auto; }
+  }
+</style>

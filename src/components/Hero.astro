@@ -1,0 +1,81 @@
+---
+import { getCollection } from 'astro:content';
+import Icon from './Icon.astro';
+import { tg } from '../lib/links';
+import { u } from '../lib/url';
+
+const deck = (await getCollection('works'))
+  .filter((w) => w.data.hero)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 7);
+
+// Высказывание под раскрытым рядом: слова проявляются, пока экран закреплён. Слова режем при сборке.
+const say = 'Покупатель листает выдачу большим пальцем. У вашей карточки есть две секунды, чтобы он остановился. Я делаю так, чтобы их хватило.';
+const accent = new Set(['две', 'секунды,']);
+---
+<section class="hero" data-hero>
+  <div class="wrap hero__in">
+    <div class="hero__copy" data-hero-copy>
+      <p class="label hero__who">Анна Вейт, дизайнер карточек</p>
+      <h1 class="hero__title">Карточки, мимо которых <em>не&nbsp;пролистывают</em></h1>
+      <p class="lede hero__lede">Главное фото, инфографика и тексты для Wildberries, Ozon и Яндекс Маркета. Первый вариант бывает готов уже через&nbsp;час.</p>
+      <div class="hero__ctas">
+        <a class="btn" href={tg} target="_blank" rel="noopener" data-magnetic><Icon name="tg" />Написать в Telegram</a>
+        <a class="btn btn--line" href="#works">Смотреть работы</a>
+      </div>
+    </div>
+  </div>
+  {deck.length > 0 && <div class="hero__stage" data-hero-stage aria-hidden="true">
+    {deck.map((w, i) => (
+      <figure class="hero__card" data-hero-card style={`--i:${i}`}>
+        <img src={u(w.data.image)} alt="" width="900" height="1200" loading={i < 4 ? 'eager' : 'lazy'} fetchpriority={i === 3 ? 'high' : 'auto'} />
+      </figure>
+    ))}
+  </div>}
+  <div class="wrap hero__say" data-hero-say>
+    <p class="display hero__say-text" aria-label={say}>
+      {say.split(' ').map((w) => <span class:list={['hero__w', { 'is-accent': accent.has(w) }]} aria-hidden="true">{w} </span>)}
+    </p>
+  </div>
+</section>
+
+<style>
+  .hero { position: relative; min-height: 100svh; display: flex; flex-wrap: wrap; align-items: center; align-content: center; padding-block: 120px 64px; overflow: clip; }
+  .hero__in { position: relative; z-index: 2; pointer-events: none; }
+  .hero__copy { max-width: 640px; pointer-events: auto; }
+  .hero__who { margin-bottom: 28px; }
+  .hero__title { font-size: clamp(50px, 6.1vw, 98px); line-height: .95; }
+  .hero__title em { color: var(--taupe); }
+  .hero__lede { margin-top: 30px; max-width: 34ch; }
+  .hero__ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 40px; }
+
+  .hero__stage { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+  .hero__card {
+    --w: clamp(160px, 15vw, 240px);
+    position: absolute; left: 73%; top: 50%; width: var(--w); aspect-ratio: 3 / 4;
+    /* центр карточки — через отступы: CSS translate GSAP сбрасывает при анимации */
+    margin: calc(var(--w) * -2 / 3) 0 0 calc(var(--w) / -2);
+    transform-origin: 50% 160%;
+    border-radius: 14px; overflow: hidden; background: var(--linen);
+    box-shadow: 0 40px 70px -30px rgba(35, 30, 27, .55), 0 2px 6px rgba(35, 30, 27, .08);
+    will-change: transform;
+  }
+  .hero__card img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* На компьютере фраза живёт внутри закреплённого экрана под поднявшимся рядом */
+  .hero__say { position: relative; z-index: 2; flex: 0 0 100%; padding-block: 24px 96px; }
+  /* С движением на компьютере — внутри закреплённого экрана; без движения — обычный блок под ним */
+  @media (min-width: 1024px) { :global(.js-motion) .hero__say { position: absolute; left: 0; right: 0; top: 57%; padding: 0; pointer-events: none; opacity: 0; } }
+  .hero__say-text { font-size: clamp(34px, 3.7vw, 60px); line-height: 1.06; max-width: 32ch; }
+  /* Без работ в веере закрепа нет — фраза стоит обычным блоком с полями .wrap */
+  :global(.js-motion) .hero__say.hero__say--static { position: relative; top: auto; opacity: 1; pointer-events: auto;
+    padding: 24px max(20px, env(safe-area-inset-right, 0px)) 96px max(20px, env(safe-area-inset-left, 0px)); }
+  .hero__w.is-accent { font-style: italic; color: var(--taupe); }
+
+  @media (max-width: 1023px) {
+    .hero__say { padding-block: 72px 24px; }
+    .hero { flex-direction: column; align-items: stretch; padding-block: 112px 0; min-height: 0; }
+    .hero__stage { position: relative; inset: auto; height: clamp(360px, 92vw, 520px); margin-top: 24px; }
+    .hero__card { --w: clamp(140px, 36vw, 210px); left: 50%; top: 46%; }
+  }
+</style>

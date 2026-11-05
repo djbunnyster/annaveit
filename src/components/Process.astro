@@ -1,0 +1,50 @@
+---
+const steps = [
+  { t: 'Ссылка или фото', d: 'Присылаете ссылку на товар, фото или пару слов о нём. Уточняю, кто покупатель и чем товар лучше соседей по выдаче.' },
+  { t: 'Главное фото', d: 'Начинаю с обложки: от неё зависит, откроют ли карточку. На ней же договариваемся о стиле всей серии.' },
+  { t: 'Слайды и тексты', d: 'Собираю остальные слайды в том же стиле. Каждый отвечает на один вопрос покупателя. Если нужно, пишу название и SEO-описание.' },
+  { t: 'Готовые файлы', d: 'Отдаю файлы в размерах Wildberries, Ozon или Яндекс Маркета. Правки входят в стоимость.' },
+];
+---
+<section class="proc">
+  <div class="wrap proc__in">
+    <div class="proc__side">
+      <h2 class="h-accent">Как проходит <em>работа</em></h2>
+      <p class="lede">От ссылки на товар до готовых файлов. Вы видите каждый шаг и на каждом можете поправить.</p>
+    </div>
+    <ol class="proc__list">
+      {steps.map((s, i) => (
+        <li class="step" style={`--n:${i}`}>
+          <span class="step__n">{i + 1}</span>
+          <h3>{s.t}</h3>
+          <p>{s.d}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .proc { padding-block: clamp(96px, 12vw, 180px); }
+  .proc__in { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(40px, 6vw, 110px); align-items: start; }
+  .proc__side { position: sticky; top: 120px; display: grid; gap: 28px; }
+  .proc__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; }
+  .step {
+    position: sticky; top: calc(110px + var(--n) * 22px);
+    display: grid; grid-template-columns: auto 1fr; gap: 10px 28px; align-items: baseline;
+    padding: clamp(28px, 3vw, 44px); border-radius: 20px;
+    background: var(--paper); box-shadow: inset 0 0 0 1px var(--line), 0 30px 60px -40px rgba(35, 30, 27, .35);
+    min-height: 260px;
+  }
+  .step:nth-child(2) { background: #EFE8DF; }
+  .step:nth-child(3) { background: var(--linen); }
+  .step:nth-child(4) { background: #E1D6C8; }
+  .step__n { grid-row: span 2; font: 500 italic clamp(56px, 6vw, 92px)/.8 var(--serif); color: var(--taupe); }
+  .step h3 { font-size: clamp(30px, 3vw, 44px); }
+  .step p { color: var(--ink-2); max-width: 44ch; }
+  @media (max-width: 900px) {
+    .proc__in { grid-template-columns: 1fr; }
+    .proc__side { position: static; }
+    .step { min-height: 0; top: calc(90px + var(--n) * 14px); }
+  }
+</style>

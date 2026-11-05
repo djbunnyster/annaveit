@@ -1,0 +1,103 @@
+/* Сайт Анны Вейт. Раскладка: широкая редакционная сетка 1360px, крупная антиква против мелкого гротеска,
+   работа и фотографии главнее интерфейса. Тема одна, светлая, по брифу (палитра со скринов владельца). */
+:root {
+  --paper: #F5F1EB;
+  --linen: #EAE2D7;
+  --sand: #CBB8A6;
+  --taupe: #9E8573;
+  --mocha: #4E3B30;
+  --ink: #231E1B;
+  --ink-2: #6B5F57;
+  --line: rgba(35, 30, 27, .14);
+  --on-dark: #F5F1EB;
+  --on-dark-2: #BDAE9F;
+
+  --serif: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
+  --sans: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  --max: 1360px;
+  --gutter: max(20px, env(safe-area-inset-left, 0px));
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 17px/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+img, video { display: block; max-width: 100%; height: auto; }
+/* Атрибут hidden сильнее любого display: иначе правило выше показывало «спрятанные» видео и картинки (скептик 01.11) */
+[hidden] { display: none !important; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--mocha); outline-offset: 4px; border-radius: 4px; }
+::selection { background: var(--sand); color: var(--ink); }
+
+/* Бумажное зерно: неподвижный слой поверх всего, мышь сквозь него проходит */
+body::after {
+  content: "";
+  position: fixed; inset: 0; z-index: 90; pointer-events: none;
+  opacity: .32; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .25 0 0 0 0 .2 0 0 0 .18 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.wrap {
+  width: 100%; max-width: var(--max); margin-inline: auto;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+}
+
+/* Типографика */
+.display, h1, h2, h3 { font-family: var(--serif); font-weight: 500; letter-spacing: -.01em; line-height: .98; margin: 0; text-wrap: balance; }
+h2 { font-size: clamp(44px, 6.6vw, 104px); }
+h3 { font-size: clamp(28px, 2.6vw, 38px); line-height: 1.05; }
+em { font-style: italic; }
+.h-accent em { color: var(--taupe); }
+p { margin: 0; text-wrap: pretty; }
+.label {
+  font: 600 12px/1.2 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2);
+}
+.lede { font-size: clamp(17px, 1.35vw, 20px); line-height: 1.55; color: var(--ink-2); max-width: 44ch; }
+
+/* Кнопки */
+.btn {
+  --bg: var(--ink); --fg: var(--paper);
+  display: inline-flex; align-items: center; gap: 12px;
+  height: 58px; padding: 0 28px; border-radius: 999px;
+  background: var(--bg); color: var(--fg);
+  font: 600 16px/1 var(--sans); white-space: nowrap;
+  transition: background .35s var(--ease), color .35s var(--ease);
+  will-change: transform;
+}
+.btn svg { width: 20px; height: 20px; flex: none; }
+.btn:hover { --bg: var(--mocha); }
+.btn--line { --bg: transparent; --fg: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.btn--line:hover { --bg: var(--ink); --fg: var(--paper); }
+.btn--light { --bg: var(--paper); --fg: var(--ink); }
+.btn--light:hover { --bg: var(--sand); }
+
+.link-u { background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: background-size .45s var(--ease); padding-bottom: 2px; }
+.link-u:hover { background-size: 100% 1px; }
+
+section { position: relative; }
+
+/* Курсор: точка и кольцо, только для мыши */
+.cursor { position: fixed; left: 0; top: 0; z-index: 100; pointer-events: none; display: none; }
+.cursor__dot { position: fixed; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: var(--ink); }
+.cursor__ring { position: fixed; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(35,30,27,.45); display: grid; place-items: center; }
+.cursor__ring span { font: 600 10px/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--paper); opacity: 0; }
+@media (pointer: fine) { .has-cursor .cursor { display: block; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

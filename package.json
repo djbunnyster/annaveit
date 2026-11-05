@@ -1,0 +1,18 @@
+{
+  "name": "anna-veit-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "channel": "node scripts/fetch-channel.mjs",
+    "dev": "astro dev",
+    "build": "node scripts/check-content.mjs && node scripts/check-prices.mjs && node scripts/fetch-channel.mjs && astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/manrope": "^5.3.0",
+    "astro": "^5.18.2",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.27"
+  }
+}

@@ -1,0 +1,49 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { tg } from '../../lib/links';
+import { u } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  return posts.map((p) => ({ params: { slug: p.id }, props: { post: p } }));
+}
+const { post } = Astro.props;
+const { Content } = await render(post);
+const home = import.meta.env.BASE_URL;
+const date = post.data.date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+<Base title={`${post.data.title}, Анна Вейт`} description={post.data.excerpt} image={post.data.cover}>
+  <article class="post">
+    <div class="wrap post__in">
+      <a class="link-u post__back" href={`${home}blog/`}>Все статьи</a>
+      <p class="post__date">{date}</p>
+      <h1>{post.data.title}</h1>
+      {post.data.cover && <img class="post__cover" src={u(post.data.cover)} alt="" />}
+      <div class="prose"><Content /></div>
+      <div class="post__cta">
+        <p>Нужна такая карточка для вашего товара? Пришлите ссылку, назову цену и срок.</p>
+        <a class="btn" href={tg} target="_blank" rel="noopener"><Icon name="tg" />Написать в Telegram</a>
+      </div>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .post { padding-block: 150px 120px; }
+  .post__in { max-width: 820px; }
+  .post__back { font-weight: 600; }
+  .post__date { margin-top: 40px; color: var(--taupe); }
+  .post h1 { margin-top: 12px; font-size: clamp(44px, 6vw, 84px); }
+  .post__cover { margin-top: 40px; width: 100%; border-radius: 14px; }
+  .prose { margin-top: 48px; font-size: 19px; line-height: 1.7; }
+  .prose :global(p + p) { margin-top: 1em; }
+  .prose :global(h2) { font-size: clamp(32px, 3.4vw, 48px); margin: 1.6em 0 .5em; }
+  .prose :global(h3) { margin: 1.4em 0 .4em; }
+  .prose :global(img) { border-radius: 12px; margin: 1.6em 0; }
+  .prose :global(ul), .prose :global(ol) { padding-left: 1.2em; margin: 1em 0; }
+  .prose :global(a) { text-decoration: underline; text-underline-offset: 3px; }
+  .post__cta { margin-top: 72px; padding: 40px; border-radius: 20px; background: var(--linen); display: grid; gap: 24px; justify-items: start; }
+  .post__cta p { font: 500 clamp(24px, 2.2vw, 32px)/1.2 var(--serif); max-width: 30ch; }
+</style>

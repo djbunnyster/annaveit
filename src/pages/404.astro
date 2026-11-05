@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { tg } from '../lib/links';
+const home = import.meta.env.BASE_URL;
+---
+<Base title="Страница не найдена, Анна Вейт">
+  <section class="nf">
+    <div class="wrap">
+      <h1 class="h-accent">Такой страницы <em>нет</em></h1>
+      <p class="lede">Возможно, ссылка устарела. Все работы и цены на главной.</p>
+      <div class="nf__ctas">
+        <a class="btn" href={home}>На главную</a>
+        <a class="btn btn--line" href={tg} target="_blank" rel="noopener"><Icon name="tg" />Написать в Telegram</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf { min-height: 80svh; display: grid; align-items: center; padding-block: 160px 96px; }
+  .nf h1 { font-size: clamp(48px, 7vw, 104px); }
+  .nf .lede { margin-top: 24px; }
+  .nf__ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
+</style>

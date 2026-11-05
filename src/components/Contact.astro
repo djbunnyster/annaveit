@@ -1,0 +1,54 @@
+---
+import Icon from './Icon.astro';
+import site from '../data/site.json';
+import { tg, channel, mail } from '../lib/links';
+import { u } from '../lib/url';
+---
+<section class="contact" id="contact" data-hide-float>
+  <div class="contact__photo" data-reveal-img>
+    <img src={u('/img/anna-contact.jpg')} alt="Анна Вейт" width="1200" height="1600" loading="lazy" />
+  </div>
+  <div class="contact__text">
+    <h2>Пришлите ссылку <em>на&nbsp;товар</em></h2>
+    <p class="contact__lede">Назову точную цену и срок. Удобнее всего написать в Telegram.</p>
+    <a class="btn btn--light contact__main" href={tg} target="_blank" rel="noopener" data-magnetic><Icon name="tg" />Написать @{site.telegram}</a>
+    <ul class="contact__alt">
+      <li><a class="link-u" href={mail}><Icon name="mail" />{site.email}</a></li>
+      <li><a class="link-u" href={channel} target="_blank" rel="noopener"><Icon name="channel" />Канал @{site.channel}</a></li>
+    </ul>
+  </div>
+</section>
+<footer class="foot">
+  <div class="wrap foot__in">
+    <p>© {new Date().getFullYear()} Анна Вейт. Дизайн карточек для маркетплейсов</p>
+    <nav class="foot__links">
+      <a class="link-u" href={`${import.meta.env.BASE_URL}privacy/`}>Политика данных</a>
+      <button class="link-u foot__btn" type="button" data-consent-open>Настройки cookie</button>
+      <a class="link-u" href={tg} target="_blank" rel="noopener">Telegram</a>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .contact { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); background: var(--mocha); color: var(--on-dark); min-height: 100svh; }
+  .contact__photo { position: relative; overflow: hidden; }
+  .contact__photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 25%; }
+  .contact__text { align-self: center; padding: clamp(56px, 7vw, 120px) max(20px, env(safe-area-inset-right, 0px)) clamp(56px, 7vw, 120px) clamp(32px, 6vw, 110px); display: grid; gap: 28px; justify-items: start; }
+  .contact__text h2 { color: var(--on-dark); font-size: clamp(48px, 6vw, 100px); }
+  .contact__text h2 em { color: var(--sand); }
+  .contact__lede { color: var(--on-dark-2); max-width: 34ch; font-size: 18px; }
+  .contact__main { margin-top: 8px; }
+  .contact__alt { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 14px; }
+  .contact__alt a { display: inline-flex; align-items: center; gap: 12px; font-size: 17px; }
+  .contact__alt :global(svg) { width: 20px; height: 20px; color: var(--sand); }
+  .foot { background: var(--mocha); color: var(--on-dark-2); border-top: 1px solid rgba(245, 241, 235, .12); }
+  .foot__links { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+  .foot__btn { font: inherit; color: inherit; background-color: transparent; border: 0; padding: 0 0 2px; cursor: pointer; }
+  .foot__in { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding-block: 28px calc(28px + env(safe-area-inset-bottom, 0px)); font-size: 14px; }
+  @media (max-width: 900px) {
+    .contact { grid-template-columns: 1fr; min-height: 0; }
+    .contact__photo { aspect-ratio: 4 / 5; }
+    .contact__text { padding-inline: max(20px, env(safe-area-inset-left, 0px)) max(20px, env(safe-area-inset-right, 0px)); }
+    .foot__in { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+  }
+</style>

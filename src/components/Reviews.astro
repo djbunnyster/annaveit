@@ -1,0 +1,33 @@
+---
+import { getCollection } from 'astro:content';
+import { u } from '../lib/url';
+
+const reviews = (await getCollection('reviews')).sort((a, b) => a.data.order - b.data.order);
+---
+{reviews.length > 0 && (
+<section class="rv" id="reviews">
+  <div class="wrap">
+    <h2 class="h-accent rv__h">Что говорят <em>клиенты</em></h2>
+    <ul class="rv__list">
+      {reviews.map((r) => (
+        <li class="rv__item" data-reveal>
+          <blockquote>{r.data.text}</blockquote>
+          <p class="rv__who"><b>{r.data.name}</b>{r.data.shop && <span>{r.data.shop}</span>}</p>
+          {r.data.image && <img class="rv__img" src={u(r.data.image)} alt={`Отзыв: ${r.data.name}`} loading="lazy" />}
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+)}
+
+<style>
+  .rv { padding-block: clamp(96px, 12vw, 180px) 0; }
+  .rv__h { margin-bottom: clamp(40px, 5vw, 72px); }
+  .rv__list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: clamp(20px, 2.4vw, 32px); }
+  .rv__item { display: grid; gap: 20px; align-content: start; padding: clamp(28px, 3vw, 40px); border-radius: 20px; background: var(--linen); }
+  .rv__item blockquote { margin: 0; font: 500 clamp(22px, 1.9vw, 28px)/1.3 var(--serif); }
+  .rv__who { display: grid; gap: 4px; font-size: 15px; }
+  .rv__who span { color: var(--ink-2); }
+  .rv__img { width: 100%; max-height: 420px; object-fit: contain; object-position: left top; border-radius: 12px; }
+</style>

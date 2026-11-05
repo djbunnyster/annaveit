@@ -1,0 +1,45 @@
+---
+import { u } from '../lib/url';
+import about from '../data/about.json';
+
+// Текст и факты Аня правит в админке; абзацы второго поля разделяет пустая строка
+const paras = about.text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+---
+<section class="about" id="about">
+  <div class="wrap about__in">
+    <div class="about__photo" data-reveal-img>
+      <img src={u(about.photo)} alt="Анна Вейт за работой" width="1200" height="1600" loading="lazy" />
+    </div>
+    <div class="about__text">
+      <h2 class="h-accent">Привет, <em>я&nbsp;Аня</em></h2>
+      <div class="about__body">
+        <p>{about.lead}</p>
+        {paras.map((p) => <p>{p}</p>)}
+      </div>
+      <ul class="about__facts">
+        {about.facts.map((f) => <li><b>{f.num} <i>{f.unit}</i></b><span>{f.label}</span></li>)}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about { padding-block: clamp(96px, 12vw, 180px); background: var(--linen); }
+  .about__in { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(40px, 7vw, 120px); align-items: center; }
+  .about__photo { position: relative; }
+  .about__photo::before { content: ''; position: absolute; inset: 9% -7% -6% 12%; background: var(--sand); border-radius: 18px; }
+  .about__photo img { position: relative; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 18px; }
+  .about__text { display: grid; gap: 36px; }
+  .about__body { display: grid; gap: 18px; font-size: clamp(17px, 1.3vw, 19px); color: var(--ink-2); max-width: 52ch; }
+  .about__body p:first-child { font: 500 clamp(24px, 2.2vw, 32px)/1.25 var(--serif); color: var(--ink); }
+  .about__facts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+  .about__facts li { display: grid; gap: 6px; padding-top: 18px; border-top: 1px solid var(--line); }
+  .about__facts b { font: 500 clamp(48px, 4.6vw, 68px)/1 var(--serif); color: var(--mocha); white-space: nowrap; font-variant-numeric: lining-nums; }
+  .about__facts b i { font-size: clamp(22px, 1.8vw, 26px); color: var(--taupe); margin-left: 4px; }
+  .about__facts span { color: var(--ink-2); font-size: 15px; line-height: 1.45; }
+  @media (max-width: 900px) {
+    .about__in { grid-template-columns: 1fr; }
+    .about__photo { max-width: 460px; }
+    .about__facts { grid-template-columns: 1fr; }
+  }
+</style>

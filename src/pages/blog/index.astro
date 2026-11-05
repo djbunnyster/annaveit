@@ -1,0 +1,45 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { u } from '../../lib/url';
+
+const posts = (await getCollection('posts')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const home = import.meta.env.BASE_URL;
+const fmt = (d: Date) => d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+<Base title="Статьи о карточках для маркетплейсов, Анна Вейт" description="Как сделать карточку товара, которую открывают: разборы и советы дизайнера карточек для Wildberries, Ozon и Яндекс Маркета.">
+  <section class="blog">
+    <div class="wrap">
+      <h1>Статьи</h1>
+      {posts.length === 0 && <p class="lede blog__empty">Первая статья скоро появится. Пока разборы выходят в канале.</p>}
+      <ul class="blog__list">
+        {posts.map((p) => (
+          <li>
+            <a class="row" href={`${home}blog/${p.id}/`}>
+              {p.data.cover && <img src={u(p.data.cover)} alt="" loading="lazy" />}
+              <span class="row__text">
+                <span class="row__date">{fmt(p.data.date)}</span>
+                <span class="row__title">{p.data.title}</span>
+                {p.data.excerpt && <span class="row__ex">{p.data.excerpt}</span>}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .blog { padding-block: 160px 120px; }
+  .blog h1 { font-size: clamp(56px, 8vw, 120px); }
+  .blog__empty { margin-top: 24px; }
+  .blog__list { list-style: none; margin: 56px 0 0; padding: 0; display: grid; gap: 0; }
+  .row { display: grid; grid-template-columns: 220px 1fr; gap: 32px; align-items: center; padding-block: 28px; border-top: 1px solid var(--line); }
+  .row img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 10px; }
+  .row__text { display: grid; gap: 8px; }
+  .row__date { font-size: 14px; color: var(--taupe); }
+  .row__title { font: 500 clamp(28px, 2.6vw, 40px)/1.08 var(--serif); }
+  .row__ex { color: var(--ink-2); max-width: 60ch; }
+  @media (max-width: 700px) { .row { grid-template-columns: 1fr; gap: 16px; } }
+</style>

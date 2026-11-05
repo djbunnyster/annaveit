@@ -1,0 +1,105 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import Consent from '../components/Consent.astro';
+import { tg } from '../lib/links';
+import { u } from '../lib/url';
+import site from '../data/site.json';
+import prices from '../data/prices.json';
+import '@fontsource/cormorant-garamond/500.css';
+import '@fontsource/cormorant-garamond/500-italic.css';
+import '@fontsource/cormorant-garamond/600.css';
+import '@fontsource/cormorant-garamond/600-italic.css';
+import '@fontsource/manrope/400.css';
+import '@fontsource/manrope/500.css';
+import '@fontsource/manrope/600.css';
+import '@fontsource/manrope/700.css';
+
+interface Props { title?: string; description?: string; image?: string }
+const props = Astro.props;
+// Пустая строка из админки — тоже «нет значения»: иначе превью ссылки указывало бы на саму страницу
+const title = props.title || 'Анна Вейт, дизайн карточек для Wildberries, Ozon и Яндекс Маркета';
+// Цены для поиска — из прайса, который Аня правит в админке; строку без числа («договорная») пропускаем
+const amounts = prices.items.map((i) => Number(i.price.replace(/\D/g, ''))).filter((n) => n > 0);
+const rub = (n: number) => n.toLocaleString('ru-RU');
+const lead = amounts.length ? `От ${rub(Math.min(...amounts))} ₽, срок` : 'Срок';
+const description = props.description || `Главное фото, инфографика и SEO-тексты для карточек на Wildberries, Ozon и Яндекс Маркете. ${lead} от одного часа, правки включены.`;
+const image = props.image || '/img/og.jpg';
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const home = import.meta.env.BASE_URL;
+---
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="ru_RU" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={new URL(u(image), Astro.site)} />
+  <meta name="theme-color" content="#F5F1EB" />
+  <link rel="icon" href={u('/favicon.svg')} type="image/svg+xml" />
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org', '@type': 'ProfessionalService',
+    name: 'Анна Вейт, дизайн карточек для маркетплейсов', url: Astro.site + home.slice(1),
+    email: site.email, sameAs: [`https://t.me/${site.telegram}`, `https://t.me/${site.channel}`],
+    areaServed: 'RU', ...(amounts.length && { priceRange: `${Math.min(...amounts)}-${Math.max(...amounts)} ₽` }),
+  })} />
+</head>
+<body>
+  <header class="top" data-top>
+    <div class="wrap top__in">
+      <a class="top__logo" href={home} aria-label="Анна Вейт, на главную">Анна <em>Вейт</em></a>
+      <nav class="top__nav" aria-label="Разделы">
+        <a class="link-u" href={`${home}#works`}>Работы</a>
+        <a class="link-u" href={`${home}#cases`}>До и после</a>
+        <a class="link-u" href={`${home}#price`}>Стоимость</a>
+        <a class="link-u" href={`${home}#about`}>Обо мне</a>
+      </nav>
+      <a class="btn top__cta" href={tg} target="_blank" rel="noopener" data-magnetic>Написать</a>
+    </div>
+  </header>
+
+  <main><slot /></main>
+
+  <a class="float-tg" href={tg} target="_blank" rel="noopener" aria-label="Написать Анне в Telegram" data-float>
+    <Icon name="tg" />
+  </a>
+  <Consent />
+  <div class="cursor" aria-hidden="true"><div class="cursor__ring"><span>Смотреть</span></div><div class="cursor__dot"></div></div>
+
+  <script>
+    import { boot } from '../scripts/motion';
+    boot();
+  </script>
+</body>
+</html>
+
+<style>
+  .top { position: fixed; z-index: 50; left: 0; right: 0; top: 0; padding-top: env(safe-area-inset-top, 0px); transition: transform .5s var(--ease), background .4s var(--ease); }
+  .top.is-solid { background: rgba(245, 241, 235, .82); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2); box-shadow: 0 1px 0 var(--line); }
+  .top.is-hidden { transform: translateY(-110%); }
+  .top__in { display: flex; align-items: center; gap: 32px; height: 76px; }
+  .top__logo { font: 500 26px/1 var(--serif); letter-spacing: -.01em; }
+  .top__logo em { color: var(--taupe); }
+  .top__nav { display: flex; gap: 28px; margin-left: auto; font: 500 15px/1 var(--sans); }
+  .top__cta { height: 46px; padding: 0 22px; font-size: 15px; }
+  @media (max-width: 900px) {
+    .top__nav { display: none; }
+    .top__cta { margin-left: auto; }
+  }
+
+  .float-tg {
+    position: fixed; z-index: 60; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    width: 60px; height: 60px; border-radius: 50%; display: none; place-items: center;
+    background: var(--ink); color: var(--paper); box-shadow: 0 14px 30px -10px rgba(35, 30, 27, .55);
+    transform: translateY(140%); transition: transform .5s var(--ease);
+  }
+  .float-tg :global(svg) { width: 26px; height: 26px; }
+  .float-tg.is-on { transform: none; }
+  @media (max-width: 900px) { .float-tg { display: grid; } }
+</style>

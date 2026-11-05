@@ -1,0 +1,8 @@
+{
+  "title": "Видеообложка для свечи",
+  "niche": "Rich-контент",
+  "image": "/uploads/works/svecha-video.jpg",
+  "video": "/uploads/works/svecha-video.mp4",
+  "order": 125,
+  "hero": false
+}

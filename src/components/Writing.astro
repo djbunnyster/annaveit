@@ -1,0 +1,75 @@
+---
+// Статья с сайта и свежие разборы из канала — одной секцией после вопросов, чтобы не рвать путь к заявке.
+import { getCollection } from 'astro:content';
+import channel from '../data/channel.json';
+import site from '../data/site.json';
+import Icon from './Icon.astro';
+import { channel as channelUrl } from '../lib/links';
+import { u } from '../lib/url';
+
+const post = (await getCollection('posts')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())[0];
+const home = import.meta.env.BASE_URL;
+const fmt = (d: Date) => d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+const cut = (s: string, n: number) => (s.length > n ? s.slice(0, s.lastIndexOf(' ', n)) + '…' : s);
+---
+{(post || channel.posts.length > 0) && (
+<section class="wr">
+  <div class="wrap">
+    <h2 class="h-accent wr__h">Пишу <em>о карточках</em></h2>
+    <div class:list={['wr__grid', { 'wr__grid--solo': !post || !channel.posts.length }]}>
+      {post && (
+        <a class="art" href={`${home}blog/${post.id}/`} data-cursor="Читать">
+          {post.data.cover && <span class="art__img"><img src={u(post.data.cover)} alt="" loading="lazy" /></span>}
+          <span class="art__date">Статья, {fmt(post.data.date)}</span>
+          <span class="art__title">{post.data.title}</span>
+          {post.data.excerpt && <span class="art__ex">{post.data.excerpt}</span>}
+        </a>
+      )}
+      {channel.posts.length > 0 && (
+        <div class="tg">
+          <p class="tg__head">Свежее в канале</p>
+          <ul class="tg__list">
+            {channel.posts.map((p) => (
+              <li>
+                <a class="tg__item" href={`https://t.me/${site.channel}/${p.id}`} target="_blank" rel="noopener">
+                  <img src={u(p.img)} alt="" width="96" height="120" loading="lazy" />
+                  <span>
+                    <span class="tg__title">{cut(p.title, 80)}</span>
+                    <span class="tg__text">{cut(p.text, 110)}</span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <a class="btn btn--line tg__sub" href={channelUrl} target="_blank" rel="noopener"><Icon name="channel" />Подписаться на канал</a>
+        </div>
+      )}
+    </div>
+  </div>
+</section>
+)}
+
+<style>
+  .wr { padding-block: 0 clamp(96px, 12vw, 180px); }
+  .wr__h { margin-bottom: clamp(40px, 5vw, 72px); }
+  .wr__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 88px); align-items: start; }
+  .wr__grid--solo { grid-template-columns: minmax(0, 1fr); max-width: 760px; }
+  .art { display: grid; gap: 14px; }
+  .art__img { display: block; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 14px; background: var(--linen); }
+  .art__img img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.1s var(--ease); }
+  .art:hover .art__img img { transform: scale(1.04); }
+  .art__date { font-size: 14px; color: var(--ink-2); }
+  .art__title { font: 500 clamp(30px, 2.6vw, 40px)/1.08 var(--serif); }
+  .art__ex { color: var(--ink-2); max-width: 52ch; }
+  .tg__head { font: 600 13px/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+  .tg__list { list-style: none; margin: 0; padding: 0; }
+  .tg__item { display: grid; grid-template-columns: 96px 1fr; gap: 20px; align-items: start; padding-block: 20px; border-bottom: 1px solid var(--line); }
+  .tg__item img { width: 96px; height: 120px; object-fit: cover; border-radius: 8px; transition: transform .6s var(--ease); }
+  .tg__item:hover img { transform: scale(1.04); }
+  .tg__item > span { display: grid; gap: 6px; }
+  .tg__title { font: 500 21px/1.15 var(--serif); }
+  .tg__text { font-size: 15px; color: var(--ink-2); }
+  .tg__sub { margin-top: 28px; }
+  .tg :global(.btn svg) { width: 20px; height: 20px; }
+  @media (max-width: 900px) { .wr__grid { grid-template-columns: minmax(0, 1fr); } }
+</style>
