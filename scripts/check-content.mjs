@@ -4,7 +4,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 
 // Нет папки — сломан путь замка (громко). Пустая папка — законно: Аня удалила единственную статью, и сайт обязан
-// собираться дальше (веер 05.11: прежний замок ронял здесь сборку, и сайт переставал обновляться совсем).
+// собираться дальше (веер 05.11). Пустую папку git не хранит — её держит src/content/posts/.gitkeep (скептик починок).
 const dir = new URL('../src/content/posts/', import.meta.url);
 if (!existsSync(dir)) {
   console.error('check-content: нет папки src/content/posts — замок смотрит не туда');

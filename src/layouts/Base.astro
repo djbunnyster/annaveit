@@ -19,11 +19,15 @@ interface Props { title?: string; description?: string; image?: string }
 const props = Astro.props;
 // Пустая строка из админки — тоже «нет значения»: иначе превью ссылки указывало бы на саму страницу
 const title = props.title || 'Анна Вейт, дизайн карточек для Wildberries, Ozon и Яндекс Маркета';
-// Цены для поиска — из прайса, который Аня правит в админке. Берём ПЕРВОЕ число строки: вилка «2 200–3 000» — это 2200,
-// а не 22003000 (веер 05.11); строку без числа («договорная») пропускаем.
-const amounts = prices.items
-  .map((i) => Number(i.price.match(/\d[\d\s\u00a0]*/)?.[0].replace(/\D/g, '') ?? 0))
-  .filter((n) => n > 0);
+// Цены для поиска — из прайса, который Аня правит в админке. Цена — первое число, за которым идёт знак рубля или тире
+// вилки: «2 200–3 000» — это 2200, а не 22003000 (веер 05.11); «5 слайдов за 2 200» — 2200, а не 5 (скептик починок).
+// Ни того ни другого — первое число; строку без числа («договорная») пропускаем.
+const amount = (s: string) => {
+  const nums = [...s.matchAll(/\d(?:[\d\s\u00a0]*\d)?/g)];
+  const hit = nums.find((m) => /^\s?[₽–—-]/.test(s.slice(m.index! + m[0].length))) ?? nums[0];
+  return hit ? hit[0].replace(/\D/g, '') : '';
+};
+const amounts = prices.items.map((i) => Number(amount(i.price))).filter((n) => n > 0);
 const rub = (n: number) => n.toLocaleString('ru-RU');
 const lead = amounts.length ? `От ${rub(Math.min(...amounts))} ₽, срок` : 'Срок';
 const description = props.description || `Главное фото, инфографика и SEO-тексты для карточек на Wildberries, Ozon и Яндекс Маркете. ${lead} от одного часа, правки включены.`;
