@@ -22,7 +22,7 @@
   `check-prices` (цена только в `src/data/prices.json`), свежие посты канала, сборка Astro.
 - Контент — файлы: `src/content/{works,cases,posts,reviews}`, `src/data/*.json`. Их пишет админка
   (`/root/anna-admin`, свой коммит на каждое «Сохранить»), поля сверяет её сторож `tests/test_schema_parity.py`.
-- Выкладка: GitHub Actions → Pages на каждый push в `main` и раз в шесть часов (блок «Свежее в канале»). GitHub
+- Выкладка: GitHub Actions → Pages на каждый push в `main` и раз в час (блок «Свежее в канале»). GitHub
   выключает расписание после 60 дней без изменений в репозитории — тогда включить на вкладке Actions.
 - Домен: переменные репозитория `SITE_URL=https://annaveit.ru`, `SITE_BASE=/`; свой домен — в настройках Pages (файл
   `CNAME` не нужен). DNS — Cloudflare, только DNS, без прокси: корень — A/AAAA GitHub Pages, `www` — CNAME на

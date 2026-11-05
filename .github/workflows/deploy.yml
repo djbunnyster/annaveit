@@ -6,7 +6,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '17 */6 * * *'
+    - cron: '17 * * * *'  # посты канала на сайте — не позже чем через час (просьба Ани 05.11)
   workflow_dispatch:
 
 permissions:
