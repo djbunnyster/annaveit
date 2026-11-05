@@ -25,8 +25,9 @@
 - Выкладка: GitHub Actions → Pages на каждый push в `main` и раз в час (блок «Свежее в канале»). GitHub
   выключает расписание после 60 дней без изменений в репозитории — тогда включить на вкладке Actions.
 - Домен: переменные репозитория `SITE_URL=https://annaveit.ru`, `SITE_BASE=/`; свой домен — в настройках Pages (файл
-  `CNAME` не нужен). DNS — Cloudflare, только DNS, без прокси: корень — A/AAAA GitHub Pages, `www` — CNAME на
-  `djbunnyster.github.io`, `admin` — туннель Cloudflare к серверу админки. Почты на домене нет: SPF `-all`, DMARC
-  `reject`, пустой MX.
+  `CNAME` не нужен). DNS — Cloudflare, только DNS, без прокси (прокси Cloudflare в России режется): корень и `www` —
+  A-записи GitHub Pages, БЕЗ AAAA (у VPN нет IPv6 — с AAAA сайт не открывался через VPN, 05.11); `admin` — A на
+  московский релей 89.127.209.21, дальше общий вход сервера по имени и Caddy админки. Почты на домене нет: SPF `-all`,
+  DMARC `reject`, пустой MX.
 - Яндекс Метрика 114088892 включается только после согласия посетителя (`src/components/Consent.astro`).
 - Ключ IndexNow — файл `public/<ключ>.txt`, его же знает админка: о новой статье или работе она сообщает Яндексу сама.
