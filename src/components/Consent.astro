@@ -59,7 +59,12 @@ const home = import.meta.env.BASE_URL;
   bar?.querySelector('[data-consent-yes]')?.addEventListener('click', () => { write(true); bar.hidden = true; load(); });
   bar?.querySelector('[data-consent-no]')?.addEventListener('click', () => {
     write(false); bar.hidden = true;
-    if (loaded) location.reload(); // отозвала согласие — уже загруженный счётчик выгружаем перезагрузкой
+    // Отозвала согласие: стираем cookie Метрики (_ym_*) и выгружаем счётчик перезагрузкой (веер 05.11)
+    document.cookie.split(';').map((c) => c.split('=')[0].trim()).filter((n) => n.startsWith('_ym')).forEach((n) => {
+      for (const d of ['', `; domain=${location.hostname}`, `; domain=.${location.hostname.replace(/^www\./, '')}`])
+        document.cookie = `${n}=; max-age=0; path=/${d}`;
+    });
+    if (loaded) location.reload();
   });
   document.addEventListener('click', (e) => {
     if ((e.target as Element).closest('[data-consent-open]') && bar) bar.hidden = false;

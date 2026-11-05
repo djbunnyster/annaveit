@@ -12,7 +12,8 @@ const walk = (dir) => {
     if (statSync(p).isDirectory()) walk(p);
     else if (/\.(astro|ts|mjs|js)$/.test(p)) {
       readFileSync(p, 'utf8').split('\n').forEach((line, i) => {
-        if (/\d[\d\s ]*\s?₽/.test(line)) bad.push(`${p}:${i + 1}: ${line.trim()}`);
+        // все формы цены руками: с пробелами и неразрывными пробелами, &nbsp;, `${2200}` и «руб.» (веер 05.11)
+        if (/\d[\d\s\u00a0}]*\s?(?:₽|руб)/.test(line.replace(/&nbsp;/g, ' '))) bad.push(`${p}:${i + 1}: ${line.trim()}`);
       });
     }
   }

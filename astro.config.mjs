@@ -1,8 +1,8 @@
 import { defineConfig } from 'astro/config';
 
-// Адрес сайта и подпапка задаются при сборке: на GitHub Pages сайт живёт в /veit-design/,
-// а на своём домене .ru подпапки не будет (переменные репозитория SITE_URL и SITE_BASE=/).
-const base = process.env.SITE_BASE || '/veit-design/';
+// Адрес сайта и подпапка задаются при сборке (переменные репозитория SITE_URL и SITE_BASE). Умолчание — боевой домен:
+// пропади переменные, сайт соберётся под annaveit.ru, а не под чужой подпапкой (веер 05.11).
+const base = process.env.SITE_BASE || '/';
 
 // Картинки, вставленные в текст статьи через админку, приходят как «/uploads/…» — приклеиваем подпапку сайта
 function uploadsBase() {
@@ -17,7 +17,7 @@ function uploadsBase() {
 }
 
 export default defineConfig({
-  site: process.env.SITE_URL || 'https://djbunnyster.github.io',
+  site: process.env.SITE_URL || 'https://annaveit.ru',
   base,
   trailingSlash: 'always',
   markdown: { rehypePlugins: [uploadsBase] },

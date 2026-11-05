@@ -1,14 +1,16 @@
 // Замок перед сборкой: дата статьи — только ГГГГ-ММ-ДД, так её пишет админка (admin.annaveit.ru).
 // Повод (01.11): прежняя админка записала «01.11.2026», сборка прочла его как 11 января, а «25.11.2026» роняло сборку
 // целиком — сайт тихо переставал обновляться. Статья с другой датой — громкий отказ здесь, а не тихая поломка.
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 
+// Нет папки — сломан путь замка (громко). Пустая папка — законно: Аня удалила единственную статью, и сайт обязан
+// собираться дальше (веер 05.11: прежний замок ронял здесь сборку, и сайт переставал обновляться совсем).
 const dir = new URL('../src/content/posts/', import.meta.url);
-const files = readdirSync(dir).filter((f) => f.endsWith('.md'));
-if (!files.length) {
-  console.error('check-content: статей не найдено — замку нечего проверять, проверь путь');
+if (!existsSync(dir)) {
+  console.error('check-content: нет папки src/content/posts — замок смотрит не туда');
   process.exit(1);
 }
+const files = readdirSync(dir).filter((f) => f.endsWith('.md'));
 const bad = files.filter((f) => {
   const head = readFileSync(new URL(f, dir), 'utf8').match(/^---\n([\s\S]*?)\n---/);
   const date = head?.[1].match(/^date:\s*['"]?([^'"\n]*)['"]?\s*$/m)?.[1];
